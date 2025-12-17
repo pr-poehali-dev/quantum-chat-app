@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "name": "Create group chat",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "name": "Test Group",
+        "chat_type": "group",
+        "member_ids": []
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "id": "number",
+        "name": "string",
+        "chat_type": "string",
+        "avatar_url": "string",
+        "created_at": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

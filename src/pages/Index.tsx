@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import ChatSidebar from '@/components/ChatSidebar';
 import ChatWindow from '@/components/ChatWindow';
 import ChatInfo from '@/components/ChatInfo';
+import LoginScreen from '@/components/LoginScreen';
+import SettingsModal from '@/components/SettingsModal';
+import CreateChatModal from '@/components/CreateChatModal';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
+import { getCurrentUser, User } from '@/lib/auth';
 
 export interface Message {
   id: string;
@@ -26,11 +30,14 @@ export interface Chat {
 }
 
 export default function Index() {
+  const [user, setUser] = useState<User | null>(null);
   const [isDark, setIsDark] = useState(false);
   const [selectedChatId, setSelectedChatId] = useState<string>('1');
   const [showInfo, setShowInfo] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showCreateChat, setShowCreateChat] = useState(false);
 
   const [chats, setChats] = useState<Chat[]>([
     {
@@ -94,6 +101,11 @@ export default function Index() {
       ]
     }
   ]);
+
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    setUser(currentUser);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -186,6 +198,13 @@ export default function Index() {
     }, 3000);
   };
 
+  const handleDeleteChat = (chatId: string) => {
+    setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
+    if (selectedChatId === chatId) {
+      setSelectedChatId(chats[0]?.id || '');
+    }
+  };
+
   const handleChatSelect = (chatId: string) => {
     setSelectedChatId(chatId);
     if (isMobile) {
@@ -196,6 +215,10 @@ export default function Index() {
   const handleBackToChats = () => {
     setShowSidebar(true);
   };
+
+  if (!user) {
+    return <LoginScreen onLoginSuccess={() => setUser(getCurrentUser())} />;
+  }
 
   return (
     <div className="h-screen flex flex-col bg-background">
@@ -213,12 +236,25 @@ export default function Index() {
           <Button
             variant="ghost"
             size="icon"
+            onClick={() => setShowCreateChat(true)}
+            className="rounded-xl"
+          >
+            <Icon name="Plus" size={20} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsDark(!isDark)}
             className="rounded-xl"
           >
             <Icon name={isDark ? 'Sun' : 'Moon'} size={20} />
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowSettings(true)}
+            className="rounded-xl"
+          >
             <Icon name="Settings" size={20} />
           </Button>
         </div>
@@ -242,9 +278,24 @@ export default function Index() {
         )}
 
         {!isMobile && showInfo && selectedChat && (
-          <ChatInfo chat={selectedChat} />
+          <ChatInfo chat={selectedChat} onDeleteChat={handleDeleteChat} />
         )}
       </div>
+
+      <SettingsModal
+        open={showSettings}
+        onOpenChange={setShowSettings}
+        user={user}
+        onUserUpdate={setUser}
+        onLogout={() => setUser(null)}
+      />
+
+      <CreateChatModal
+        open={showCreateChat}
+        onOpenChange={setShowCreateChat}
+        userId={user.id}
+        onChatCreated={() => {}}
+      />
     </div>
   );
 }

@@ -5,9 +5,10 @@ import { Chat } from '@/pages/Index';
 
 interface ChatInfoProps {
   chat: Chat;
+  onDeleteChat: (chatId: string) => void;
 }
 
-export default function ChatInfo({ chat }: ChatInfoProps) {
+export default function ChatInfo({ chat, onDeleteChat }: ChatInfoProps) {
   const isGroup = chat.id === '2';
 
   return (
@@ -98,7 +99,11 @@ export default function ChatInfo({ chat }: ChatInfoProps) {
             <Icon name="Archive" size={18} className="mr-2" />
             Архивировать чат
           </Button>
-          <Button variant="ghost" className="w-full justify-start rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10">
+          <Button
+            variant="ghost"
+            className="w-full justify-start rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={() => onDeleteChat(chat.id)}
+          >
             <Icon name="Trash2" size={18} className="mr-2" />
             Удалить чат
           </Button>

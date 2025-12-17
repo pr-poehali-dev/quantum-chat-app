@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Google OAuth login",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "google_id": "123456789",
+        "email": "test@gmail.com",
+        "name": "Test User",
+        "avatar_url": "https://example.com/avatar.jpg"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "id": "number",
+        "google_id": "string",
+        "email": "string",
+        "name": "string",
+        "avatar_url": "string",
+        "created_at": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
